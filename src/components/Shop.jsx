@@ -2,7 +2,34 @@ import React from 'react';
 import Image from './Image';
 import Typhography from './Typhography';
 
+import { data } from '../data';
+import ShopItem from './ShopItem';
+
+function fakeAPI() {
+  return new Promise((ressolve) => {
+    setTimeout(() => {
+      ressolve(data)
+    }, 1000)
+  })
+}
+
 function Shop() {
+  const [dataSource, setDataSource] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  // call api
+  React.useEffect(() => {
+   async function fetchShoes() {
+      setIsLoading(true);
+      const response = await fakeAPI();
+
+      setIsLoading(false);
+      setDataSource(response)
+   };
+
+   fetchShoes();
+  }, []); // run once time
+
   return (
     <div className="card">
       <div className="cardTop">
@@ -14,27 +41,12 @@ function Shop() {
       <Typhography className="cardTitle">Our Products</Typhography>
 
       <div className="cardBody">
-        <div className="shopItem">
-          <div
-            className="shopItem_image"
-            style={{ backgroundColor: "rgb(212, 215, 214)" }}
-          >
-            <Image 
-              src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1315882/air-zoom-pegasus-36-mens-running-shoe-wide-D24Mcz-removebg-preview.png"
-            />
-          </div>
-          <Typhography className="shopItem_name">Nike Air Zoom Pegasus 36</Typhography>
-          <Typhography className="shopItem_description">
-            The iconic Nike Air Zoom Pegasus 36 offers more cooling and mesh
-            that targets breathability across high-heat areas. A slimmer heel
-            collar and tongue reduce bulk, while exposed cables give you a
-            snug fit at higher speeds.
-          </Typhography>
-          <div className="shopItem_bottom">
-            <Typhography className="shopItem_price">$108.97</Typhography>
-            <Typhography className="shopItem_button">ADD TO CART</Typhography>
-          </div>
-        </div>
+        {isLoading && <div>Loading ...</div>}
+        {dataSource.map(item => {
+          return (
+            <ShopItem key={item.id} item={item} />
+          )
+        })}
       </div>
     </div>
   )
